@@ -3,6 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+../service-configuration-g5/ms-seguridad.json
 
 ### STS ###
 .apt_generated
