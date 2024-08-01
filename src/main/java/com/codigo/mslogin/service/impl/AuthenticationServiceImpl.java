@@ -10,10 +10,13 @@ import com.codigo.mslogin.entities.Role;
 import com.codigo.mslogin.entities.Usuario;
 import com.codigo.mslogin.service.AuthenticationService;
 import com.codigo.mslogin.service.JwtService;
+import com.codigo.mslogin.service.UsuarioService;
+import com.codigo.mslogin.util.AppUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RolRepository rolRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UsuarioService usuarioService;
     @Transactional
     @Override
     public Usuario signUpUser(SignUpRequest signUpRequest) {
@@ -83,5 +87,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setToken(token);
         return authenticationResponse;
+    }
+
+    @Override
+    public boolean validateToken(String token) {
+        final String jwt;
+        final String userEmail;
+
+        if(AppUtil.isNotNullOrEmpty(token)){
+            jwt = token.substring(7);
+            userEmail = jwtService.extractUserName(jwt);
+            if(AppUtil.isNotNullOrEmpty(userEmail)){
+                UserDetails userDetails = usuarioService.userDetailService().loadUserByUsername(userEmail);
+                return jwtService.validateToken(jwt, userDetails);
+            }
+        }
+        return false;
     }
 }

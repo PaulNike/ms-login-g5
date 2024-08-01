@@ -13,5 +13,6 @@ public interface AuthenticationService {
     List<Usuario> todos();
 
     AuthenticationResponse signin(SignInRequest signInRequest);
+    boolean validateToken(String token);
 
 }
